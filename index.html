@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grit Terminal | World's 1st Traders Ecosystem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://s3.tradingview.com/tv.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              terminal: {
+                black: 'var(--terminal-black)',
+                green: 'var(--terminal-green)',
+                darkGreen: 'var(--terminal-darkGreen)',
+                dim: 'var(--terminal-dim)',
+                alert: 'var(--terminal-alert)',
+                contrast: 'var(--terminal-contrast)'
+              }
+            },
+            fontFamily: {
+              mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", 'monospace'],
+              sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+            }
+          }
+        },
+        darkMode: 'class'
+      }
+    </script>
+    <style>
+      :root {
+        --terminal-black: #0c0c0c;
+        --terminal-green: #4ade80;
+        --terminal-darkGreen: #14532d;
+        --terminal-dim: #22c55e;
+        --terminal-alert: #ef4444;
+        --terminal-contrast: #ffffff;
+        --terminal-gray: #6b7280;
+      }
+
+      .theme-bloomberg {
+        --terminal-black: #000000;
+        --terminal-green: #ffb800; /* Amber */
+        --terminal-darkGreen: #333333;
+        --terminal-dim: #ff8c00;
+        --terminal-alert: #ff3e3e;
+        --terminal-contrast: #ffffff;
+      }
+
+      .theme-ocean {
+        --terminal-black: #000d1a;
+        --terminal-green: #00d2ff;
+        --terminal-darkGreen: #00334d;
+        --terminal-dim: #00a8cc;
+        --terminal-alert: #ff4b2b;
+        --terminal-contrast: #e6f9ff;
+      }
+
+      .theme-sun {
+        --terminal-black: #1a0f00;
+        --terminal-green: #ff9d00;
+        --terminal-darkGreen: #4d2f00;
+        --terminal-dim: #ffeb3b;
+        --terminal-alert: #ff4444;
+        --terminal-contrast: #fff9e6;
+      }
+
+      .theme-white {
+        --terminal-black: #ffffff;
+        --terminal-green: #2563eb; /* Pro Blue */
+        --terminal-darkGreen: #e5e7eb;
+        --terminal-dim: #4b5563;
+        --terminal-alert: #dc2626;
+        --terminal-contrast: #0f172a;
+      }
+
+      .theme-grey {
+        --terminal-black: #121212;
+        --terminal-green: #e0e0e0;
+        --terminal-darkGreen: #333333;
+        --terminal-dim: #9e9e9e;
+        --terminal-alert: #cf6679;
+        --terminal-contrast: #ffffff;
+      }
+
+      .theme-glass {
+        --terminal-black: rgba(15, 23, 42, 0.45);
+        --terminal-green: #22d3ee;
+        --terminal-darkGreen: rgba(34, 211, 238, 0.15);
+        --terminal-dim: rgba(34, 211, 238, 0.8);
+        --terminal-alert: #f43f5e;
+        --terminal-contrast: #ffffff;
+      }
+
+      .theme-apple-glass {
+        --terminal-black: rgba(255, 255, 255, 0.4);
+        --terminal-green: #007aff; /* Apple Blue */
+        --terminal-darkGreen: rgba(0, 122, 255, 0.1);
+        --terminal-dim: #555555;
+        --terminal-alert: #ff3b30;
+        --terminal-contrast: #1d1d1f;
+        background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%) fixed !important;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif !important;
+      }
+
+      body {
+        background-color: var(--terminal-black);
+        color: var(--terminal-green);
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      body.theme-glass {
+        background: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #0f172a 60%, #000000 100%) fixed !important;
+      }
+
+      /* Theme specific overrides */
+      .theme-white .text-white { color: var(--terminal-contrast) !important; }
+      .theme-white .bg-black { background-color: var(--terminal-black) !important; }
+      .theme-white .bg-black\/95 { background-color: rgba(255, 255, 255, 0.95) !important; }
+      .theme-white .bg-black\/80 { background-color: rgba(255, 255, 255, 0.8) !important; }
+      .theme-white .bg-\[\#050505\] { background-color: #f9fafb !important; }
+      .theme-white .bg-\[\#0a0a0a\] { background-color: #f3f4f6 !important; }
+      .theme-white .bg-\[\#010101\] { background-color: #ffffff !important; }
+      .theme-white .bg-\[\#020202\] { background-color: #ffffff !important; }
+      .theme-white .text-gray-500 { color: #64748b !important; }
+      .theme-white .text-gray-200 { color: #1e293b !important; }
+
+      /* Glass Theme Overrides */
+      .theme-glass .bg-black, .theme-glass .bg-\[\#050505\], .theme-glass .bg-\[\#0a0a0a\], .theme-glass .bg-\[\#010101\], .theme-glass .bg-\[\#020202\], .theme-glass .bg-\[\#030303\], .theme-glass .bg-\[\#080808\], .theme-glass .bg-black\/95, .theme-glass .bg-black\/90, .theme-glass .bg-black\/80, .theme-glass .bg-black\/60, .theme-glass .bg-black\/50, .theme-glass .bg-black\/40, .theme-glass .bg-black\/20 {
+        background-color: var(--terminal-black) !important;
+        backdrop-filter: blur(16px) saturate(180%);
+        -webkit-backdrop-filter: blur(16px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      /* Apple Glass Theme Overrides */
+      .theme-apple-glass .bg-black, .theme-apple-glass .bg-\[\#050505\], .theme-apple-glass .bg-\[\#0a0a0a\], .theme-apple-glass .bg-\[\#010101\], .theme-apple-glass .bg-\[\#020202\], .theme-apple-glass .bg-\[\#030303\], .theme-apple-glass .bg-\[\#080808\], .theme-apple-glass .bg-black\/95, .theme-apple-glass .bg-black\/90, .theme-apple-glass .bg-black\/80, .theme-apple-glass .bg-black\/60, .theme-apple-glass .bg-black\/50, .theme-apple-glass .bg-black\/40, .theme-apple-glass .bg-black\/20 {
+        background-color: rgba(255, 255, 255, 0.5) !important;
+        backdrop-filter: blur(25px) saturate(200%);
+        -webkit-backdrop-filter: blur(25px) saturate(200%);
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: #1d1d1f !important;
+      }
+      .theme-apple-glass .text-terminal-green { color: #007aff !important; }
+      .theme-apple-glass .text-white { color: #1d1d1f !important; }
+      .theme-apple-glass .text-gray-500, .theme-apple-glass .text-gray-600, .theme-apple-glass .text-gray-700 { color: #86868b !important; }
+      .theme-apple-glass .border-terminal-darkGreen, .theme-apple-glass .border-terminal-green { border-color: rgba(0, 0, 0, 0.1) !important; }
+      .theme-apple-glass header {
+        background-color: rgba(255, 255, 255, 0.7) !important;
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+      }
+      .theme-apple-glass .shadow-2xl { box-shadow: 0 20px 40px rgba(0,0,0,0.05) !important; }
+      .theme-apple-glass h1, .theme-apple-glass h2, .theme-apple-glass h3 { color: #1d1d1f !important; font-weight: 600 !important; }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--terminal-black); 
+        border-left: 1px solid var(--terminal-darkGreen);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--terminal-darkGreen); 
+        border: 1px solid var(--terminal-black);
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--terminal-dim); 
+      }
+      .terminal-glow {
+        text-shadow: 0 0 4px rgba(var(--terminal-green-rgb, 74, 222, 128), 0.3);
+      }
+      .tv-widget-container iframe {
+        border-radius: 0 !important;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "recharts": "https://esm.sh/recharts@^3.6.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.33.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.561.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "d3": "https://esm.sh/d3@^7.9.0",
+    "topojson-client": "https://esm.sh/topojson-client@^3.1.0"
+  }
+}
+</script>
+</head>
+  <body class="font-mono antialiased min-h-screen overflow-y-auto selection:bg-terminal-darkGreen selection:text-white">
+    <div id="root"></div>
+  </body>
+</html>
