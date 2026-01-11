@@ -26,28 +26,27 @@ import { BondsHub } from './components/BondsHub';
 import { MacroHub } from './components/MacroHub';
 import { TradeHub } from './components/TradeHub';
 import { BettingHub } from './components/BettingHub';
+import { ThemeScrollWheel } from './components/ThemeScrollWheel';
+import { useTheme } from './contexts/ThemeContext';
 import { GoogleGenAI } from "@google/genai";
 import { 
   RefreshCw, BarChart2, Activity, Terminal, 
   Zap, Timer, LayoutGrid, Globe, 
   ArrowRightLeft, Cpu, Skull, Box,
   Home, Briefcase, Search, Building2, ChevronDown, TrendingUp,
-  Droplets, Banknote, Landmark, LineChart, Wallet2, Trophy,
-  Palette, Sun, Moon, Cloud, Waves, Monitor, Layers, Apple
+  Droplets, Banknote, Landmark, LineChart, Wallet2, Trophy
 } from 'lucide-react';
 
 export type ViewMode = 'MARKET' | 'FUNDING' | 'MOMENTUM' | 'HEATMAP';
 export type MainHub = 'HUB' | 'CRYPTO' | 'STOCKS' | 'COMMODITIES' | 'FOREX' | 'BONDS' | 'MACRO' | 'TRADE' | 'BETTING';
 export type CryptoSubTab = 'TERMINAL' | 'CONDUIT' | 'CARNAGE' | 'VISUALIZER';
 export type Exchange = 'BINANCE' | 'BYBIT' | 'OKX' | 'HYPERLIQUID' | 'COINBASE' | 'MEXC' | 'COINDCX' | 'COINSWITCH';
-export type Theme = 'DEFAULT' | 'BLOOMBERG' | 'OCEAN' | 'SUN' | 'WHITE' | 'GREY' | 'GLASS' | 'APPLE_GLASS';
 
 // Initialize Gemini AI client once
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const SaturnLogo = () => (
   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-terminal-green">
-    {/* The Rings (Back half) */}
     <path 
       d="M2.5 12C2.5 10.3431 6.7533 9 12 9C17.2467 9 21.5 10.3431 21.5 12" 
       stroke="currentColor" 
@@ -55,12 +54,9 @@ const SaturnLogo = () => (
       strokeLinecap="round"
       transform="rotate(-15 12 12)"
     />
-    {/* The Planet */}
     <circle cx="12" cy="12" r="5" fill="currentColor" fillOpacity="0.9" />
     <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="0.5" />
-    {/* Highlight on the planet */}
     <path d="M10 9.5C10 9.5 11 8.5 12.5 8.5" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-    {/* The Rings (Front half) */}
     <path 
       d="M2.5 12C2.5 13.6569 6.7533 15 12 15C17.2467 15 21.5 13.6569 21.5 12" 
       stroke="currentColor" 
@@ -77,9 +73,11 @@ function App() {
   const [exchange, setExchange] = useState<Exchange>('BINANCE');
   const [viewMode, setViewMode] = useState<ViewMode>('MARKET');
   const [conduitAsset, setConduitAsset] = useState<string>('BTC');
-  const [theme, setTheme] = useState<Theme>('DEFAULT');
   
-  // New Stocks Logic
+  // Theme state now comes from Context
+  const { theme } = useTheme();
+  
+  // Stocks Logic
   const [stocksView, setStocksView] = useState<'MAP' | 'DETAIL'>('MAP');
   const [selectedCountryId, setSelectedCountryId] = useState<string | null>(null);
 
@@ -104,42 +102,9 @@ function App() {
   const [quoteFilter, setQuoteFilter] = useState<string>('USDT');
   const [visibleCount, setVisibleCount] = useState<number>(50);
 
-  // Apply Theme to body
-  useEffect(() => {
-    const themeClass = theme === 'BLOOMBERG' ? 'theme-bloomberg' :
-                       theme === 'OCEAN' ? 'theme-ocean' :
-                       theme === 'SUN' ? 'theme-sun' :
-                       theme === 'WHITE' ? 'theme-white' :
-                       theme === 'GREY' ? 'theme-grey' :
-                       theme === 'GLASS' ? 'theme-glass' :
-                       theme === 'APPLE_GLASS' ? 'theme-apple-glass' : '';
-                       
-    document.body.className = `font-mono antialiased min-h-screen overflow-y-auto transition-colors duration-500 ${themeClass}`;
-  }, [theme]);
-
   const addLog = (log: LogEntry) => {
     setTerminalLogs(prev => [...prev.slice(-49), log]);
   };
-
-  // Log sequence handler
-  useEffect(() => {
-    if (activeHub !== 'CRYPTO' || cryptoTab !== 'TERMINAL') return;
-
-    if (isInitialMount.current) {
-      addLog({ id: Date.now().toString(), timestamp: Date.now(), type: 'INFO', message: `INITIATING_SEQUENCE :: FETCH_ASSETS -> ${exchange}` });
-      isInitialMount.current = false;
-    } else if (exchange !== prevExchange.current) {
-      addLog({ id: Date.now().toString(), timestamp: Date.now(), type: 'INFO', message: `SYSTEM_RECONFIGURED :: CONTEXT_SWITCH -> ${exchange}` });
-      addLog({ id: Date.now().toString()+1, timestamp: Date.now(), type: 'INFO', message: `INITIATING_SEQUENCE :: FETCH_ASSETS -> ${exchange}` });
-      prevExchange.current = exchange;
-    }
-  }, [exchange, activeHub, cryptoTab]);
-
-  useEffect(() => {
-    if (tickers.length > 0 && activeHub === 'CRYPTO' && cryptoTab === 'TERMINAL') {
-      addLog({ id: Date.now().toString(), timestamp: Date.now(), type: 'INFO', message: `SUCCESS :: ${tickers.length} NODES_SYNCED_FOR_${exchange}` });
-    }
-  }, [tickers.length, exchange]);
 
   useEffect(() => {
     liquidationAggregator.start((liq) => {
@@ -247,7 +212,7 @@ function App() {
   };
 
   return (
-    <div className={`min-h-screen pb-20 font-mono text-terminal-green bg-terminal-black transition-all duration-500`}>
+    <div className={`min-h-screen pb-20 bg-terminal-black font-mono text-terminal-green`}>
       <header className="sticky top-0 z-[60] bg-terminal-black/95 border-b border-terminal-darkGreen px-6 py-4 flex flex-col md:flex-row gap-4 items-center justify-between backdrop-blur-md">
         <div className="flex items-center gap-3 w-full md:w-auto">
           <div className="border border-terminal-green p-1.5 shadow-[0_0_15px_rgba(74,222,128,0.15)] bg-black">
@@ -274,17 +239,8 @@ function App() {
         </div>
 
         <div className="flex items-center gap-4 w-full md:w-auto">
-          {/* Theme Switcher */}
-          <div className="flex bg-terminal-black border border-terminal-darkGreen p-1 rounded-sm gap-1">
-            <button onClick={() => setTheme('DEFAULT')} className={`p-2 transition-all ${theme === 'DEFAULT' ? 'bg-terminal-green text-terminal-black' : 'text-gray-500 hover:text-terminal-green'}`} title="Green Terminal"><Terminal size={14} /></button>
-            <button onClick={() => setTheme('BLOOMBERG')} className={`p-2 transition-all ${theme === 'BLOOMBERG' ? 'bg-terminal-green text-terminal-black' : 'text-gray-500 hover:text-terminal-green'}`} title="Bloomberg Amber"><Monitor size={14} /></button>
-            <button onClick={() => setTheme('OCEAN')} className={`p-2 transition-all ${theme === 'OCEAN' ? 'bg-terminal-green text-terminal-black' : 'text-gray-500 hover:text-terminal-green'}`} title="Ocean Cyan"><Waves size={14} /></button>
-            <button onClick={() => setTheme('SUN')} className={`p-2 transition-all ${theme === 'SUN' ? 'bg-terminal-green text-terminal-black' : 'text-gray-500 hover:text-terminal-green'}`} title="Sun Orange"><Sun size={14} /></button>
-            <button onClick={() => setTheme('WHITE')} className={`p-2 transition-all ${theme === 'WHITE' ? 'bg-terminal-green text-terminal-black' : 'text-gray-500 hover:text-terminal-green'}`} title="Classic Light"><Cloud size={14} /></button>
-            <button onClick={() => setTheme('GREY')} className={`p-2 transition-all ${theme === 'GREY' ? 'bg-terminal-green text-terminal-black' : 'text-gray-500 hover:text-terminal-green'}`} title="Industrial Grey"><Palette size={14} /></button>
-            <button onClick={() => setTheme('GLASS')} className={`p-2 transition-all ${theme === 'GLASS' ? 'bg-terminal-green text-terminal-black' : 'text-gray-500 hover:text-terminal-green'}`} title="Glassmorphism"><Layers size={14} /></button>
-            <button onClick={() => setTheme('APPLE_GLASS')} className={`p-2 transition-all ${theme === 'APPLE_GLASS' ? 'bg-terminal-green text-terminal-black' : 'text-gray-500 hover:text-terminal-green'}`} title="Apple Glass"><Apple size={14} /></button>
-          </div>
+          {/* Theme Switcher Scroll Wheel */}
+          <ThemeScrollWheel />
 
           {activeHub === 'CRYPTO' && cryptoTab === 'TERMINAL' && (
             <div className="flex-1 md:flex-none bg-terminal-black border border-terminal-darkGreen px-4 py-2 flex items-center focus-within:border-terminal-green transition-all shadow-inner">
@@ -394,9 +350,9 @@ function App() {
               </>
             )}
 
-            {cryptoTab === 'CONDUIT' && <div className="h-[700px]"><LiveTradeFeed initialAsset={conduitAsset} /></div>}
-            {cryptoTab === 'CARNAGE' && <div className="h-[700px]"><CarnageDashboard liquidations={liquidations} sessionTotalUsd={sessionStats.totalUsd} sessionCount={sessionStats.count} /></div>}
-            {cryptoTab === 'VISUALIZER' && <div className="h-[700px]"><TransactionVisualizer /></div>}
+            {cryptoTab === 'CONDUIT' && <div className="h-[700px] border border-terminal-darkGreen"><LiveTradeFeed initialAsset={conduitAsset} /></div>}
+            {cryptoTab === 'CARNAGE' && <div className="h-[700px] border border-terminal-darkGreen"><CarnageDashboard liquidations={liquidations} sessionTotalUsd={sessionStats.totalUsd} sessionCount={sessionStats.count} /></div>}
+            {cryptoTab === 'VISUALIZER' && <div className="h-[700px] border border-terminal-darkGreen"><TransactionVisualizer /></div>}
           </>
         ) : activeHub === 'STOCKS' ? (
           <div className="bg-terminal-black border-2 border-terminal-darkGreen shadow-[0_0_40px_rgba(var(--terminal-green-rgb),0.1)] overflow-hidden min-h-[600px] relative">

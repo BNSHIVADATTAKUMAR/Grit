@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import * as d3 from 'd3';
 import { 
@@ -116,7 +115,6 @@ export const TradeHub: React.FC<TradeHubProps> = ({ cryptoTickers }) => {
         }
         setOrderBook(book);
       } else if (sector === 'PREDICTION_MARKET') {
-        // Mocking prediction market data by scaling AAPL/NVDA data to 0-100
         const source = symbol.includes('NVDA') ? 'NVDA' : 'AAPL';
         const history = await fetchStockKlines(source, '1d', '5m');
         if (history && history.length > 0) {
@@ -166,7 +164,6 @@ export const TradeHub: React.FC<TradeHubProps> = ({ cryptoTickers }) => {
     return () => ws.stop();
   }, [currentAsset, activeSector]);
 
-  // Indicator Calculations
   const sma20Data = useMemo(() => {
     if (!indicators.sma20 || klines.length < 20) return [];
     return klines.map((d, i, arr) => {
@@ -176,7 +173,6 @@ export const TradeHub: React.FC<TradeHubProps> = ({ cryptoTickers }) => {
     }).filter(d => d !== null) as { time: number; val: number }[];
   }, [klines, indicators.sma20]);
 
-  // Main Rendering Logic
   useEffect(() => {
     if (!chartRef.current || dimensions.width === 0) return;
     
@@ -192,7 +188,6 @@ export const TradeHub: React.FC<TradeHubProps> = ({ cryptoTickers }) => {
     const g = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
     const gViewport = g.append("g").attr("class", "viewport");
 
-    // X & Y Scales
     const dataStart = klines.length > 0 ? klines[0].time : Date.now() - 3600000;
     const dataEnd = klines.length > 0 ? klines[klines.length - 1].time : Date.now();
     const xScale = d3.scaleTime().domain([dataStart, dataEnd + (dataEnd - dataStart) * 0.1]).range([0, width]);
@@ -217,13 +212,11 @@ export const TradeHub: React.FC<TradeHubProps> = ({ cryptoTickers }) => {
 
     const yScale = d3.scaleLinear().domain([yMin * 0.999, yMax * 1.001]).range([height, 0]);
 
-    // Grid System
     g.append("g").attr("class", "grid-x").attr("transform", `translate(0, ${height})`)
       .call(d3.axisBottom(rescaledX).ticks(8).tickSize(-height)).attr("color", "#ffffff05").selectAll("text").attr("fill", "#444");
     g.append("g").attr("class", "grid-y").attr("transform", `translate(${width}, 0)`)
       .call(d3.axisRight(yScale).ticks(10).tickSize(-width)).attr("color", "#ffffff05").selectAll("text").attr("fill", "#4ade80").attr("font-size", "9px");
 
-    // Candle/Data Rendering
     if (klines.length > 0) {
       const candleWidth = Math.max(1, (width / klines.length) * zoomTransform.k * 0.7);
       if (chartView === 'LINE') {
@@ -240,7 +233,6 @@ export const TradeHub: React.FC<TradeHubProps> = ({ cryptoTickers }) => {
       }
     }
 
-    // Positions, TP/SL Draggable
     const gUI = g.append("g").attr("class", "ui-layer");
     assetPositions.forEach(p => {
       const entryY = yScale(p.entryPrice);
@@ -330,7 +322,13 @@ export const TradeHub: React.FC<TradeHubProps> = ({ cryptoTickers }) => {
       {/* MODE SELECTOR */}
       <div className="flex bg-[#0a0a0a] border-b border-terminal-darkGreen/60 p-1 gap-1 shrink-0">
          {(['SPOT', 'PERPETUAL', 'FUTURES'] as TradeMode[]).map(m => (
-           <button key={m} onClick={() => setTradeMode(m)} className={`px-6 py-1.5 text-[10px] font-black border transition-all ${tradeMode === m ? 'bg-terminal-green text-black border-terminal-green' : 'text-gray-500 border-transparent hover:text-white'}`}>{m}</button>
+           <button 
+             key={m} 
+             onClick={() => setTradeMode(m)} 
+             className={`px-6 py-1.5 text-[10px] font-black border transition-all ${tradeMode === m ? 'bg-terminal-green text-black border-terminal-green' : 'text-gray-500 border-transparent hover:text-white'}`}
+           >
+             {m}
+           </button>
          ))}
       </div>
 
